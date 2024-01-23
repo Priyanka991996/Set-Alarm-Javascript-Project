@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alarms</title>
+  <style>
+  
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 50px;
+      background-image: url('bgimage.jpg');
+      background-repeat:no-repeat;
+      background-size:cover;
+
+    }
+
+    #currentTime {
+      font-size: 30px;
+      margin-bottom: 20px;
+      color:yellow;
+    }
+
+    #alarms {
+      list-style-type: none;
+      padding: 0;
+      margin-top: 20px;
+      background-color:blueviolet;
+    }
+
+    .alarm {
+      margin-bottom: 10px;
+    }
+    .addalarmbutton{
+           background-color: rgb(0, 255, 55);
+    }
+  </style>
+</head>
+<body>
+  <h1 style="color:pink">Digital Clock and Alarm</h1><br/><br/><br/>
+  <div id="currentTime"></div>
+  <body for="alarmTime" style="color:orangered"><Set><p style="font-size:25px;">Set Alarm Time</p></label>
+  <input type="time" id="alarmTime" required>
+  <button class="addalarmbutton" onclick="addAlarm()">Add Alarm</button>
+
+  <ul class="box" id="alarms" style="color:black"></ul>
+
+  <audio id="alarmSound" src="alarmsound.mp3"></audio>
+
+  <script>
+    function updateCurrentTime() {
+      const currentTimeElement = document.getElementById('currentTime');
+      const currentTime = new Date();
+      const hours = currentTime.getHours();
+      const minutes = currentTime.getMinutes();
+      const seconds = currentTime.getSeconds();
+
+      // Format the time as HH:MM:SS
+      const formattedTime = `${padZero(hours)}:${padZero(minutes)}:${padZero(seconds)}`;
+
+      // Update the content of the currentTimeElement
+      currentTimeElement.textContent = `Current Time: ${formattedTime}`;
+
+      // Check if it's time to trigger alarms
+      checkAlarms(hours, minutes, seconds);
+    }
+
+    function addAlarm() {
+      const alarmTimeInput = document.getElementById('alarmTime');
+      const alarmTime = alarmTimeInput.value;
+
+      if (alarmTime) {
+        const alarmsList = document.getElementById('alarms');
+        const newAlarm = document.createElement('li');
+        newAlarm.className = 'alarm';
+        newAlarm.innerHTML = `<span>${alarmTime}</span> <button onclick="removeAlarm(this)" style="background-color:grey">Remove</button>`;
+        alarmsList.appendChild(newAlarm);
+
+        // Clear the input field
+        alarmTimeInput.value = '';
+      }
+    }
+
+    function removeAlarm(button) {
+      const alarmItem = button.parentNode;
+      const alarmsList = document.getElementById('alarms');
+      alarmsList.removeChild(alarmItem);
+    }
+
+    function checkAlarms(currentHours, currentMinutes, currentSeconds) {
+      const alarmsList = document.getElementById('alarms');
+      const alarmItems = alarmsList.getElementsByClassName('alarm');
+
+      for (const alarmItem of alarmItems) {
+        const alarmTime = alarmItem.querySelector('span').textContent;
+        const [alarmHours, alarmMinutes] = alarmTime.split(':').map(Number);
+
+        if (
+          currentHours === alarmHours &&
+          currentMinutes === alarmMinutes &&
+          currentSeconds === 0
+        ) {
+          triggerAlarm();
+          // Optionally, you can remove the triggered alarm from the list
+          alarmsList.removeChild(alarmItem);
+        }
+      }
+    }
+
+    function triggerAlarm() {
+      const alarmSound = document.getElementById('alarmSound');
+      alarmSound.play();
+      // You can add additional actions here, such as displaying a notification
+      console.log('Alarm triggered!');
+    }
+
+    function padZero(number) {
+      // Add a leading zero if the number is less than 10
+      return number < 10 ? `0${number}` : number;
+    }
+
+    // Update the current time every second
+    setInterval(updateCurrentTime, 1000);
+
+    // Initial update
+    updateCurrentTime();
+  </script>
+</body>
+</html>
